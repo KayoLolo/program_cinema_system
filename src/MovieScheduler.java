@@ -1,3 +1,6 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +66,71 @@ public class MovieScheduler {
         System.out.println(nbFilms);
         System.out.println(totalDuration);
     }
+
+
+    public boolean importMovie(String[] movie){
+        if (movie.length != 4){
+            throw new IllegalArgumentException("Something is missing in your tab");
+        }
+        if(movie==null){
+            throw new IllegalArgumentException("This tab cannot be empty");
+        }
+        for (int i = 0; i < movie.length; i++) {
+            if (movie[i] == null || movie[i].trim().isEmpty()) {
+                throw new IllegalArgumentException("The element is actually" + i + "empty");
+            }
+        }
+        String title = movie[0];
+        String time = movie[1];
+        String durationStr = movie[2];  // ← CORRIGÉ : index 2
+        String room = movie[3];
+
+        SimpleDateFormat format = new SimpleDateFormat("HH'h'mm");
+        Date startTime;
+        try{
+            startTime = format.parse(time);
+        }catch (ParseException e){
+            throw new IllegalArgumentException("Invalid format");
+        }
+
+        int duration;
+        try {
+            duration = Integer.parseInt(durationStr);
+            if (duration<=0 || duration >300){
+                throw new IllegalArgumentException("duration can not be positive or negative");
+            }
+        }catch (NumberFormatException e){
+            throw new IllegalArgumentException("invalid duration");
+        }
+
+        Slot slot = new Slot(startTime, duration,room);
+
+        addMovie(title, slot);
+
+        return true;
+    }
+
+    public void importMovies(String[][] movies){
+        if (movies == null){
+            throw new IllegalArgumentException("can not be null");
+        }
+        int successCount = 0;
+        int errorCount = 0;
+
+        for (int i = 0; i < movies.length; i++) {
+            try {
+                importMovie(movies[i]);
+                successCount++;
+            } catch (IllegalArgumentException e) {
+                errorCount++;
+            }
+        }
+
+        System.out.println("\n=== Import result ===");
+        System.out.println("Succes count : " + successCount);
+        System.out.println("Error count : " + errorCount);
+    }
+
 
 
 }
