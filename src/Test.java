@@ -3,7 +3,7 @@ public class Test {
         MovieScheduler movieScheduler = new MovieScheduler();
 
         System.out.println("===  ===");
-        movieScheduler.importMovies(MovieSlotTestData.getDuplicateMovieSchedule());
+        movieScheduler.importMovies(MovieSlotTestData.getValidMovieSchedule());
         System.out.println("=== ===");
         movieScheduler.importMovies(MovieSlotTestData.getProblematicMovieSchedule());
         System.out.println("=== ===");
