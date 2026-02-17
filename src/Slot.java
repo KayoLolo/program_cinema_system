@@ -62,13 +62,22 @@ public class Slot {
     }
 
     public boolean hasTimeConflict(Slot other) {
-        Date firstTime = getEndTime2();
-        Date otherTime = other.getEndTime2();
-
-        if (getEndTime2().before(firstTime)==getEndTime2().after(otherTime)){
-            return true;
+        if(other == null){
+            throw new IllegalArgumentException("error in otherTime");
         }
-        return false;
+        if (!this.room.equalsIgnoreCase(other.room)) {
+            return false;
+        }
+        Date firstTimeStart = this.startTime;
+        Date firstTimeEnd = this.getEndTime2();
+        Date otherTimeStart = other.startTime;
+        Date otherTimeEnd = other.getEndTime2();
+
+
+        if (firstTimeEnd.before(otherTimeStart) || firstTimeStart.after(otherTimeEnd)){
+            return false;
+        }
+        return true;
     }
 
 
