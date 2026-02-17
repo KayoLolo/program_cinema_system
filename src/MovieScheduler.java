@@ -141,6 +141,51 @@ public class MovieScheduler {
         System.out.println("Error count : " + errorCount);
     }
 
+    public HashMap<String, Slot> getMoviesByRoom(String room){
+        if (room == null || room.trim().isEmpty()){
+            throw new IllegalArgumentException("Your research cannot be null");
+        }
+        HashMap<String, Slot> filmByRoom = new HashMap<>();
+        for(Map.Entry<String, Slot> entry : schedule.entrySet()){
+            if (entry.getValue().getRoom().equalsIgnoreCase(room)){
+                filmByRoom.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return filmByRoom;
+    }
 
+
+    public boolean isRoomAvailable(String room, String startTime, int duration){
+        if (room==null || room.trim().isEmpty() ){
+            throw new IllegalArgumentException("room searched can not be null");
+        }
+        if (startTime==null || startTime.trim().isEmpty() ){
+            throw new IllegalArgumentException("room searched can not be null");
+        }
+        if (duration<=0 || duration >300 ){
+            throw new IllegalArgumentException("Invalid duration");
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat("HH'h'mm");
+        Date startTimeParsed;
+        try{
+            startTimeParsed = format.parse(startTime);
+        }catch (ParseException e){
+            throw new IllegalArgumentException("Invalid format");
+        }
+
+        Slot otherSlot = new Slot(startTimeParsed, (int) duration, room);
+
+        for(Map.Entry<String, Slot> entry : schedule.entrySet()){
+            Slot existingSlot = entry.getValue();
+            if (existingSlot.getRoom().equalsIgnoreCase(room)){
+                if (existingSlot.hasTimeConflict(otherSlot)){
+                    return false;
+                }
+
+            }
+        }
+        return true;
+    }
 
 }
