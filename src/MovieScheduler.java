@@ -13,15 +13,18 @@ public class MovieScheduler {
         if (title ==null|| title.trim().isEmpty()){
             throw new IllegalArgumentException("Name can not be null");
         }
+        if (slot == null) {
+            throw new IllegalArgumentException("Slot need to be renseigned");
+        }
         for(Map.Entry<String, Slot> entry : schedule.entrySet()){
             if (entry.getKey().equals(title) && entry.getValue().equals(slot)){
                 throw new IllegalArgumentException("Titles can not be the same");
             }
+            if (slot.hasTimeConflict(entry.getValue())){
+                throw new IllegalArgumentException("Time confilct");
+            }
         }
 
-        if (slot.hasTimeConflict(schedule.get(title))){
-            throw new IllegalArgumentException("Slot need to be renseigned");
-        }
         schedule.put(title,slot);
     }
 
@@ -69,21 +72,23 @@ public class MovieScheduler {
 
 
     public boolean importMovie(String[] movie){
-        if (movie.length != 4){
-            throw new IllegalArgumentException("Something is missing in your tab");
-        }
         if(movie==null){
             throw new IllegalArgumentException("This tab cannot be empty");
         }
+
+        if (movie.length != 4){
+            throw new IllegalArgumentException("Something is missing in your tab");
+        }
+
         for (int i = 0; i < movie.length; i++) {
             if (movie[i] == null || movie[i].trim().isEmpty()) {
                 throw new IllegalArgumentException("The element is actually" + i + "empty");
             }
         }
-        String title = movie[0];
-        String time = movie[1];
-        String durationStr = movie[2];  // ← CORRIGÉ : index 2
-        String room = movie[3];
+        String title = movie[0].trim();
+        String time = movie[1].trim();
+        String durationStr = movie[2].trim();
+        String room = movie[3].trim();
 
         SimpleDateFormat format = new SimpleDateFormat("HH'h'mm");
         Date startTime;
@@ -97,7 +102,7 @@ public class MovieScheduler {
         try {
             duration = Integer.parseInt(durationStr);
             if (duration<=0 || duration >300){
-                throw new IllegalArgumentException("duration can not be positive or negative");
+                throw new IllegalArgumentException("duration can not too high or negative");
             }
         }catch (NumberFormatException e){
             throw new IllegalArgumentException("invalid duration");
@@ -114,6 +119,8 @@ public class MovieScheduler {
         if (movies == null){
             throw new IllegalArgumentException("can not be null");
         }
+        HashMap<String, Slot> backup = new HashMap<>(schedule);
+
         int successCount = 0;
         int errorCount = 0;
 
@@ -123,6 +130,9 @@ public class MovieScheduler {
                 successCount++;
             } catch (IllegalArgumentException e) {
                 errorCount++;
+                schedule.clear();
+                schedule.putAll(backup);
+                break;
             }
         }
 
